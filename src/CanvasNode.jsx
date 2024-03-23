@@ -6,9 +6,9 @@ export default function CanvasNode({ data }) {
     const getDefaultState = useCallback((label) => {
         switch (label) {
             case 'threading':
-                return 'sin(UV.x * 4. * PI)';
+                return '(sin(UV.x * 4. * PI) + 1.) / 2.';
             case 'treadling':
-                return 'sin(UV.y * 4. * PI)';
+                return '(sin(UV.y * 4. * PI) + 1.) / 2.';
             case 'tieup':
                 return '1. - texture(tieup, UV).r * 255.';
             default:

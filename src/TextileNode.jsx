@@ -43,7 +43,7 @@ export default function CanvasNode({ data }) {
                     tieup,
                     threading,
                     treadling,
-                    FP: `texture(tieup, vec2(texture(threading, UV).r, texture(treadling, UV).r))`,
+                    FP: `1. - texture(tieup, vec2(texture(threading, UV).r, texture(treadling, UV).r))`,
                 });
             });
 
