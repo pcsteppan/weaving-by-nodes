@@ -443,6 +443,12 @@ class TextureTarget extends TextureSampler {
         updateObject(this, { gl, _tag: tag, format, layern, wrap, depth });
         this.update(size, data);
     }
+    copyCanvas(canvas) {
+        const { gl } = this;
+        gl.bindTexture(gl.TEXTURE_2D, this.handle);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+    }
     update(size, data) {
         const { gl, handle, gltarget, layern } = this;
         const { internalFormat, glformat, type } = this.formatInfo;

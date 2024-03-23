@@ -18,18 +18,31 @@ export default function CanvasNode({ data }) {
         
         try {
             const glsl = SwissGL(canvas.current);
-            const [tieup, treadling, threading] = incomingNodes
-                .map((node) => node.data.exportGlsl)
-                .map((exportGlsl) => exportGlsl(glsl));
+            const [tieup, threading, treadling] = incomingNodes
+                .map((node) => {
+                    const label = node.data.label;
+                    const tex = glsl({
+                        FP: '1.,0.,0.,1.'
+                    }, {tag: label})
+                    
+                    const incomingCanvas = node.data.canvas;
+                    tex.copyCanvas(incomingCanvas);
+                    
+                    tex.refresh = () => tex.copyCanvas(incomingCanvas);
 
-            console.log('incomingNodes: ', incomingNodes);
+                    return tex;
+                });
 
             glsl.loop(({ time }) => {
+                tieup.refresh();
+                treadling.refresh();
+                threading.refresh();
+
                 glsl({
                     time,
                     tieup,
-                    treadling,
                     threading,
+                    treadling,
                     FP: `texture(tieup, vec2(texture(threading, UV).r, texture(treadling, UV).r))`,
                 });
             });

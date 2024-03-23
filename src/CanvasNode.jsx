@@ -21,43 +21,26 @@ export default function CanvasNode({ data }) {
 
     useEffect(() => {
         try {
+            data.canvas = canvas.current;
             const glsl = SwissGL(canvas.current);
 
-            // console.log('LABEL: ', data.label);
-            const exportGlsl = (canvasCtx) => {
-                const tieup = new TextureTarget(canvasCtx.gl, {
-                    size: [4, 4],
-                    format: 'r8',
-                    data: new Uint8Array([
-                        1,1,0,0,
-                        0,1,1,0,
-                        0,0,1,1,
-                        1,0,0,1,
-                    ]),
-                    tag: 'tieup'
-                });
-
-                return canvasCtx(
-                    {
-                        tieup,
-                        FP: swissInput,
-                    },
-                    {
-                        // size: [16,16],
-                        tag: data.label,
-                    }
-                )
-            };
-
-            data.exportGlsl = exportGlsl;
-
-            const localTex = exportGlsl(glsl);
+            const tieup = new TextureTarget(glsl.gl, {
+                size: [4, 4],
+                format: 'r8',
+                data: new Uint8Array([
+                    1,1,0,0,
+                    0,1,1,0,
+                    0,0,1,1,
+                    1,0,0,1,
+                ]),
+                tag: 'tieup'
+            });
 
             glsl.loop(({ time }) => {
                 glsl({
                     time,
-                    tex: localTex,
-                    FP: `tex(UV)`
+                    tieup,
+                    FP: swissInput
                 })
             });
 
@@ -65,7 +48,7 @@ export default function CanvasNode({ data }) {
             console.error(e);
         }
 
-    }, [swissInput, data]);
+    }, [canvas, swissInput, data]);
 
     return (
         <>
