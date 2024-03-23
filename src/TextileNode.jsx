@@ -15,19 +15,22 @@ export default function CanvasNode({ data }) {
     );
         
     useEffect(() => {
-        const [tieup, treadling, threading] = incomingNodes.map((node) => node.data.exportGlsl);
         
         try {
             const glsl = SwissGL(canvas.current);
+            const [tieup, treadling, threading] = incomingNodes
+                .map((node) => node.data.exportGlsl)
+                .map((exportGlsl) => exportGlsl(glsl));
 
-            data.treadling = treadling;
+            console.log('incomingNodes: ', incomingNodes);
+
             glsl.loop(({ time }) => {
                 glsl({
-                    treadling: treadling,
-                    FP: `
-                        float a = texture(treadling, UV).r;
-                        FOut = vec4(.5,a,a  ,1.);
-                    `,
+                    time,
+                    tieup,
+                    treadling,
+                    threading,
+                    FP: `texture(tieup, vec2(texture(threading, UV).r, texture(treadling, UV).r))`,
                 });
             });
 
@@ -35,7 +38,7 @@ export default function CanvasNode({ data }) {
             console.error(e);
         }
 
-    }, [incomingNodes]);
+    }, [incomingNodes, data]);
 
     return (
         <>

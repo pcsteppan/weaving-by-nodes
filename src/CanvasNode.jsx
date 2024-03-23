@@ -23,42 +23,41 @@ export default function CanvasNode({ data }) {
         try {
             const glsl = SwissGL(canvas.current);
 
-            const tieup = new TextureTarget(glsl.gl, {
-                size: [4, 4],
-                format: 'r8',
-                data: new Uint8Array([
-                    1,1,0,0,
-                    0,1,1,0,
-                    0,0,1,1,
-                    1,0,0,1,
-                ]),
-                tag: 'tieup'
-            });
+            // console.log('LABEL: ', data.label);
+            const exportGlsl = (canvasCtx) => {
+                const tieup = new TextureTarget(canvasCtx.gl, {
+                    size: [4, 4],
+                    format: 'r8',
+                    data: new Uint8Array([
+                        1,1,0,0,
+                        0,1,1,0,
+                        0,0,1,1,
+                        1,0,0,1,
+                    ]),
+                    tag: 'tieup'
+                });
 
-            console.log('LABEL: ', data.label);
-            const exportGlsl = glsl(
-                {
-                    tieup,
-                    Inc: `
-                        float tie(vec2 uv) {
-                            return 1. - texture(tieup, uv).r * 255.;
-                        }
-                    `,
-                    FP: swissInput,
-                },
-                {
-                    size: [16,16],
-                    tag: data.label,
-                }
-            );
+                return canvasCtx(
+                    {
+                        tieup,
+                        FP: swissInput,
+                    },
+                    {
+                        // size: [16,16],
+                        tag: data.label,
+                    }
+                )
+            };
 
             data.exportGlsl = exportGlsl;
+
+            const localTex = exportGlsl(glsl);
 
             glsl.loop(({ time }) => {
                 glsl({
                     time,
-                    exportGlsl,
-                    FP: `texture(exportGlsl, UV)`
+                    tex: localTex,
+                    FP: `tex(UV)`
                 })
             });
 
